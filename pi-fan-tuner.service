@@ -4,7 +4,7 @@ Wants=udev.service
 After=udev.service
 
 [Service]
-ExecStart=/bin/pi-fan-tuner fun simple
+ExecStart=/usr/local/bin/pi-fan-tuner fun simple
 WorkingDirectory=/tmp
 Restart=on-failure
 

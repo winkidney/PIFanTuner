@@ -1,0 +1,13 @@
+[Unit]
+Description=PI Fan Tunner Daemon
+Wants=udev.service
+After=udev.service
+
+[Service]
+ExecStart=/bin/pi-fan-tuner fun simple
+WorkingDirectory=/tmp
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

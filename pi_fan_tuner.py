@@ -30,17 +30,22 @@ def set_debug():
     logging.basicConfig(level=logging.DEBUG)
 
 
+@group(name="port", help="Turn a pin port to `IN` or `OUT`")
+def port_manage():
+    pass
+
+
 @option("port", help="Port on GPIO Physical Port", type=INT, default=GPIO_CONTROL_PORT)
-@command("turn-on", help="Turn a port into `OUT` mode")
-def turn_on_port(port):
+@port_manage.command("turn-out", help="Turn a port into `OUT` mode")
+def turn_port_out(port):
     GPIO.setup(port, GPIO.OUT)
     GPIO.output(port, 1)
     return True
 
 
 @option("port", help="Port number of GPIO Physical Port", type=INT, default=GPIO_CONTROL_PORT)
-@command("turn-off", help="Turn a port into `IN` mode")
-def turn_off_port(port):
+@port_manage.command("turn-in", help="Turn a port into `IN` mode")
+def turn_port_in(port):
     GPIO.setup(port, GPIO.IN)
     return False
 
@@ -72,19 +77,19 @@ def show_cpu_temperature(loop):
     type=INT,
     default=GPIO_CONTROL_PORT,
 )
-@group(name="fun", help="Auto tune the cpu fan in `simple` or `auto` mode.")
+@group(name="fan", help="Auto tune the cpu fan in `simple` or `auto` mode.")
 def auto_fan():
     pass
 
 
 @auto_fan.command("on", help="Turn one the fan.")
 def on_fan(port, **kwargs):
-    turn_on_port(port)
+    turn_port_out(port)
 
 
 @auto_fan.command("off", help="Turn off the fan.")
 def off_fan(port, **kwargs):
-    turn_off_port(port)
+    turn_port_in(port)
 
 
 @option("debug", is_flag=True, default=False)
@@ -93,7 +98,7 @@ def simple_on_of(debug, port, on_t):
     if debug:
         set_debug()
 
-    fan_on = turn_off_port(port)
+    fan_on = turn_port_in(port)
 
     try:
         while True:
@@ -101,11 +106,11 @@ def simple_on_of(debug, port, on_t):
             if temperature >= on_t:
                 if not fan_on:
                     logging.debug("Temperature {0} CPU fan on.".format(temperature))
-                    fan_on = turn_on_port(port)
+                    fan_on = turn_port_out(port)
             else:
                 if fan_on:
                     logging.debug("Temperature {0} CPU fan off.".format(temperature))
-                    fan_on = turn_off_port(port)
+                    fan_on = turn_port_in(port)
             sleep(10)
     except Exception:
         logging.exception("Error occurs while tune fan status:")
